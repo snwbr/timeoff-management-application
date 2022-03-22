@@ -39,15 +39,15 @@ RUN apk add --no-cache \
     libc-dev
 
 RUN adduser --system app --home /app 
-USER app
 WORKDIR /app
 
 FROM base as ready
+USER app
 RUN git clone https://github.com/snwbr/timeoff-management-application.git timeoff-management
 WORKDIR /app/timeoff-management
 
 ## npm ci is the way to build js code in CI platforms (https://docs.npmjs.com/cli/v8/commands/npm-ci).
-RUN npm ci
+RUN npm install
 CMD npm start
 
 ## Using multistage dockerfile to test while reusing the same dockerfile
