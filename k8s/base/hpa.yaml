@@ -1,4 +1,5 @@
-apiVersion: autoscaling/v2
+---
+apiVersion: autoscaling/v1
 kind: HorizontalPodAutoscaler
 metadata:
   name: timeoff
@@ -9,16 +10,4 @@ spec:
     name: timeoff
   minReplicas: 1
   maxReplicas: 3
-  metrics:
-  - type: Resource
-    resource:
-      name: cpu
-      target:
-        type: Utilization
-        averageUtilization: 70
-  - type: Resource
-    resource:
-      name: memory
-      target:
-        type: Utilization
-        averageUtilization: 70
+  targetCPUUtilizationPercentage: 70
