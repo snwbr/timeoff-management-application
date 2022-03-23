@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
       - name: timeoff
-        image: dperezro/timeoff:ready
+        image: dperezro/latest-main
         ports:
         - containerPort: 3000
         resources:
