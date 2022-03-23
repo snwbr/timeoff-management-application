@@ -37,7 +37,9 @@ podTemplate(
               stage('CD - Generate K8s manifests from templates') {
                 dir("k8s"){
                   sh("/app/kustomize build overlays/dev > app.yaml")
-                  sh("sed -i \"s/\(.*image: \).*/\1${env.registry}:${last_commit}/g\" app.yaml")
+                  sh("""
+                    sed -i "s/\\(.*image: \\).*/\\1${env.registry}:${last_commit}/g" app.yaml
+                    """)
                 }
               } // stage end
             }
@@ -55,6 +57,7 @@ podTemplate(
                   kubectl apply -f k8s/app.yaml
                   ''')
               } // stage end
+            }
           } catch(err) {
             if (err.toString().contains('FlowInterruptedException')) {
               currentBuild.result = 'UNSTABLE'
