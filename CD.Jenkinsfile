@@ -39,7 +39,7 @@ podTemplate(
                 dir("k8s"){
                   sh("/app/kustomize build overlays/dev > app.yaml")
                   sh("""
-                    sed -i "s/\\(.*image: \\).*/\\1${env.dockerRepo}:${last_commit}/g" app.yaml
+                    sed -i "s~\\(.*image: \\).*~\\1${env.dockerRepo}:${last_commit}~g" app.yaml
                     """)
                 }
               } // stage end
