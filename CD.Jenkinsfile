@@ -1,8 +1,8 @@
 #!/usr/bin/env groovy
 
 def ci = "tfpod-${UUID.randomUUID().toString()}"
-env.registry = "dperezro/timeoff"
-env.registryCredential = 'dockerhub-token'
+env.dockerRepo = "dperezro/timeoff"
+env.repoCredential = 'dockerhub-token'
 
 podTemplate(
   label: ci,
@@ -25,11 +25,13 @@ podTemplate(
               }
               stage('CD - Build image') {
                 last_commit = sh(returnStdout: true, script:"git rev-parse --short HEAD").trim()
-                customImage = docker.build("${env.registry}:${last_commit}", "--target ready .")
+                customImage = docker.build("${env.dockerRepo}:${last_commit}", "--target ready .")
               } // stage end
               stage('CD - Push image') {
-                customImage.push()
-                customImage.push("latest-${env.BRANCH_NAME}")
+                withDockerRegistry(credentialsId: env.repoCredential) {
+                  customImage.push()
+                  customImage.push("latest-${env.BRANCH_NAME}")
+                }
               } // stage end
             }
             container('kustomize') {
@@ -37,7 +39,7 @@ podTemplate(
                 dir("k8s"){
                   sh("/app/kustomize build overlays/dev > app.yaml")
                   sh("""
-                    sed -i "s/\\(.*image: \\).*/\\1${env.registry}:${last_commit}/g" app.yaml
+                    sed -i "s/\\(.*image: \\).*/\\1${env.dockerRepo}:${last_commit}/g" app.yaml
                     """)
                 }
               } // stage end
